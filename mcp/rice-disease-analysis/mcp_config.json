@@ -1,0 +1,29 @@
+{
+  "name": "rice-disease-analysis",
+  "description": "Rice Disease Detection and Analysis System using CNN",
+  "version": "1.0.0",
+  "capabilities": [
+    "disease_detection",
+    "model_training",
+    "data_analysis",
+    "visualization"
+  ],
+  "entry_points": {
+    "train": "train_model.py",
+    "inference": "inference.py",
+    "analysis": "rice_disease_analysis.ipynb",
+    "test": "test_setup.py"
+  },
+  "dependencies": "requirements.txt",
+  "models": {
+    "best_model": "models/best_model.h5",
+    "cnn_model": "models/rice_disease_cnn_model.h5",
+    "config": "models/rice_disease_cnn_model_config.json"
+  },
+  "dataset": "dataset/Rice Leaf and Crop Disease Detection Dataset",
+  "outputs": {
+    "plots": "plots/",
+    "results": "evaluation_results.json",
+    "history": "training_history.csv"
+  }
+}
