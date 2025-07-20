@@ -1,0 +1,16 @@
+{
+  "classes": [
+    "Bacterial Leaf Blight",
+    "Healthy _leaf",
+    "Rice",
+    "Rice Blast",
+    "Tungro"
+  ],
+  "img_size": [
+    224,
+    224
+  ],
+  "num_classes": 5,
+  "model_path": "f:\\Personal\\PrecisionAgriculture\\mcp\\rice-disease-detection\\models\\rice_disease_cnn_model.h5",
+  "created_at": "2025-07-20T11:44:48.183079"
+}
