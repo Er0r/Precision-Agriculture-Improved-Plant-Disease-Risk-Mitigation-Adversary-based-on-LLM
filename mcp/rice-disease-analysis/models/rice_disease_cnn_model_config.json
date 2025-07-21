@@ -1,6 +1,6 @@
 {
   "model_name": "rice_disease_cnn_model",
-  "input_shape": [
+  "img_size": [
     224,
     224,
     3

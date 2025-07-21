@@ -125,6 +125,10 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Model files (optional - uncomment if models are too large)
+# *.h5
+# *.pkl
+# *.joblib
 # Model files (too large for Git)
 *.h5
 *.pkl
