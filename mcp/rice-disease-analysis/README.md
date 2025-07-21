@@ -135,13 +135,6 @@ result = analyze_rice_disease('sample_images/healthy_leaf_sample.jpg')
 - 🖼️ **Visual display** of analyzed image
 - 📈 **Progress bars** showing all class probabilities
 
-## 📈 Model Performance
-
-The system achieves high accuracy through:
-- **Transfer Learning**: Leveraging pre-trained CNN architectures
-- **Data Augmentation**: Increasing dataset diversity
-- **Early Stopping**: Preventing overfitting
-- **Learning Rate Scheduling**: Optimizing convergence
 
 ## 🛠️ Dependencies
 
@@ -155,20 +148,3 @@ seaborn>=0.11.0
 pandas>=1.4.0
 Pillow>=9.0.0
 ```
-
-## 🎓 Educational Value
-
-### For Students
-- **Smart Programming**: Demonstrates intelligent workflow optimization
-- **Real-world Application**: Addresses actual agricultural challenges
-- **Best Practices**: Shows proper model management and code organization
-- **Professional Development**: Industry-standard project structure
-
-
-## 👨‍💻 Development Process
-
-This project was developed using:
-- **Smart Development Approach**: Iterative improvement with user feedback
-- **Problem-First Design**: Identified and solved real workflow inefficiencies
-- **Professional Standards**: Clean code, documentation, and project structure
-- **Testing**: Sample images and validation datasets for verification
