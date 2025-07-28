@@ -1,0 +1,29 @@
+{
+  "name": "jute-disease-analysis",
+  "description": "Jute Disease Detection and Analysis System using CNN",
+  "version": "1.0.0",
+  "capabilities": [
+    "disease_detection",
+    "model_training",
+    "data_analysis",
+    "visualization"
+  ],
+  "entry_points": {
+    "train": "train_model.py",
+    "inference": "inference.py",
+    "analysis": "jute_disease_analysis.ipynb",
+    "test": "test_setup.py"
+  },
+  "dependencies": "requirements.txt",
+  "models": {
+    "best_model": "models/best_model.h5",
+    "cnn_model": "models/jute_disease_cnn_model.h5",
+    "config": "models/jute_disease_cnn_model_config.json"
+  },
+  "dataset": "Dataset",
+  "outputs": {
+    "plots": "plots/",
+    "results": "evaluation_results.json",
+    "history": "training_history.csv"
+  }
+}
