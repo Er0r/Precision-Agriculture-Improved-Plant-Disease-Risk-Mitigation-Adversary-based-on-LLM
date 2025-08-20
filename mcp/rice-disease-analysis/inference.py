@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--model', '-m', help='Path to model file (optional)')
     parser.add_argument('--show', '-s', action='store_true', help='Show the input image')
     parser.add_argument('--output', '-o', help='Output file for results (JSON)')
+    parser.add_argument('--save-to-db', action='store_true', help='Save results to central DB instead of file')
     
     args = parser.parse_args()
     
@@ -46,8 +47,28 @@ def main():
             for class_name, prob in result['all_probabilities'].items():
                 print(f"  {class_name}: {prob:.4f} ({prob*100:.2f}%)")
         
-        # Save results if output file specified
-        if args.output:
+        # Save results: prefer DB when requested or when output is the standard evaluation filename
+        saved_to_db = False
+        if args.save_to_db or (args.output and args.output.endswith('evaluation_results.json')):
+            try:
+                # Try to import the DB helper from the backend analysis module
+                # We attempt two import paths to support running inside the repo or from the backend package
+                try:
+                    from backend.analysis.mcp_integration import save_evaluation_result_to_db
+                except Exception:
+                    from analysis.mcp_integration import save_evaluation_result_to_db
+
+                # Prepare minimal metadata
+                mcp_name = 'rice-disease-analysis'
+                model_name = args.model or ''
+                save_res = save_evaluation_result_to_db(mcp_name=mcp_name, model_name=model_name, results=result, raw_output=json.dumps(result))
+                if save_res:
+                    print(f"\nResults saved to DB: id={getattr(save_res,'id', 'unknown')}")
+                    saved_to_db = True
+            except Exception as e:
+                print(f"⚠️ Failed to save to DB, falling back to file: {e}")
+
+        if not saved_to_db and args.output:
             with open(args.output, 'w') as f:
                 json.dump(result, f, indent=2)
             print(f"\nResults saved to: {args.output}")
