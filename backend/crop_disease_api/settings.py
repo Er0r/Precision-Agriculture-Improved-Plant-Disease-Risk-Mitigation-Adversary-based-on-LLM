@@ -67,8 +67,12 @@ WSGI_APPLICATION = 'crop_disease_api.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'crop_disease_db'),
+        'USER': os.getenv('DB_USER', 'postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -121,6 +125,8 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -142,5 +148,5 @@ CROP_DISEASE_SETTINGS = {
 NIM_SETTINGS = {
     'BASE_URL': os.getenv('NIM_BASE_URL', 'https://integrate.api.nvidia.com/v1'),
     'API_KEY': os.getenv('NIM_API_KEY', ''),
-    'MODEL': os.getenv('NIM_MODEL', 'openai/gpt-oss-120b'),
+    'MODEL': os.getenv('NIM_MODEL', 'nvidia/llama-3.3-nemotron-super-49b-v1.5'),
 }

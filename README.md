@@ -110,7 +110,7 @@ DEBUG=True
 # NVIDIA NIM LLM Configuration (Optional)
 NIM_BASE_URL=https://integrate.api.nvidia.com/v1
 NIM_API_KEY=your-api-key-here
-NIM_MODEL=openai/gpt-oss-120b
+NIM_MODEL=nvidia/llama-3.3-nemotron-super-49b-v1.5
 ```
 
 ### **Frontend Configuration**

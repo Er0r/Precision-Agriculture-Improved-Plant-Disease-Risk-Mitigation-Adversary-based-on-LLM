@@ -42,8 +42,8 @@ LEARNING_RATE = 0.001
 DATASET_PATH = "dataset/Rice Leaf and Crop Disease Detection Dataset"
 
 # Model paths
-MODEL_PATH = 'models/rice_disease_cnn_model.h5'
-CONFIG_PATH = 'models/rice_disease_cnn_model_config.json'
+MODEL_PATH = Path(__file__).parent / "models" / "rice_disease_cnn_model.h5"
+CONFIG_PATH = Path(__file__).parent / "models" / "rice_disease_cnn_model_config.json"
 
 # Class names
 CLASS_NAMES = ['Bacterial Leaf Blight', 'Healthy _leaf', 'Rice', 'Rice Blast', 'Tungro']
@@ -114,116 +114,121 @@ else:
     # Set flag to proceed with training
     SKIP_TRAINING = False
 
-# Data Loading (Only if training needed)
-if not SKIP_TRAINING:
-    print("📁 Setting up data generators for training...")
-    
-    # Create data generators
-    train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-        rescale=1./255,
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        horizontal_flip=True,
-        validation_split=0.2
-    )
+# Only run training code when script is executed directly
+if __name__ == "__main__":
+    # Data Loading (Only if training needed)
+    if not SKIP_TRAINING:
+        print("📁 Setting up data generators for training...")
+        
+        # Create data generators
+        train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
+            rescale=1./255,
+            rotation_range=20,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            horizontal_flip=True,
+            validation_split=0.2
+        )
 
-    # Training data
-    train_generator = train_datagen.flow_from_directory(
-        DATASET_PATH,
-        target_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        class_mode='categorical',
-        subset='training'
-    )
+        # Training data
+        train_generator = train_datagen.flow_from_directory(
+            DATASET_PATH,
+            target_size=IMG_SIZE,
+            batch_size=BATCH_SIZE,
+            class_mode='categorical',
+            subset='training'
+        )
 
-    # Validation data
-    validation_generator = train_datagen.flow_from_directory(
-        DATASET_PATH,
-        target_size=IMG_SIZE,
-        batch_size=BATCH_SIZE,
-        class_mode='categorical',
-        subset='validation'
-    )
+        # Validation data
+        validation_generator = train_datagen.flow_from_directory(
+            DATASET_PATH,
+            target_size=IMG_SIZE,
+            batch_size=BATCH_SIZE,
+            class_mode='categorical',
+            subset='validation'
+        )
 
-    print("✅ Data generators created successfully!")
+        print("✅ Data generators created successfully!")
+    else:
+        print("⏭️ SKIPPING data preparation - using existing trained model")
+
+    # Training (Only if needed)
+    if not SKIP_TRAINING:
+        print(f"🚀 Starting training for {EPOCHS} epochs...")
+        
+        # Callbacks
+        callbacks = [
+            keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True),
+            keras.callbacks.ReduceLROnPlateau(factor=0.2, patience=5)
+        ]
+
+        # Train the model
+        history = model.fit(
+            train_generator,
+            epochs=EPOCHS,
+            validation_data=validation_generator,
+            callbacks=callbacks
+        )
+
+        print("✅ Training completed!")
+        
+        # Plot training history
+        def plot_training_history(history):
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
+            
+            ax1.plot(history.history['accuracy'], label='Training Accuracy')
+            ax1.plot(history.history['val_accuracy'], label='Validation Accuracy')
+            ax1.set_title('Model Accuracy')
+            ax1.set_xlabel('Epoch')
+            ax1.set_ylabel('Accuracy')
+            ax1.legend()
+            
+            ax2.plot(history.history['loss'], label='Training Loss')
+            ax2.plot(history.history['val_loss'], label='Validation Loss')
+            ax2.set_title('Model Loss')
+            ax2.set_xlabel('Epoch')
+            ax2.set_ylabel('Loss')
+            ax2.legend()
+            
+            plt.tight_layout()
+            plt.show()
+
+        plot_training_history(history)
+        
+        # Evaluate and save model
+        val_loss, val_accuracy = model.evaluate(validation_generator)
+        print(f"📊 Final validation accuracy: {val_accuracy:.4f}")
+        
+        # Create models directory if it doesn't exist
+        os.makedirs('models', exist_ok=True)
+        
+        # Save the model
+        model.save(MODEL_PATH)
+        print(f"💾 Model saved to: {MODEL_PATH}")
+
+        # Save model configuration
+        model_config = {
+            'model_name': 'rice_disease_cnn_model',
+            'input_shape': list(IMG_SIZE) + [3],
+            'num_classes': len(CLASS_NAMES),
+            'class_names': CLASS_NAMES,
+            'batch_size': BATCH_SIZE,
+            'epochs_trained': len(history.history['loss']),
+            'final_accuracy': float(val_accuracy),
+            'final_loss': float(val_loss)
+        }
+
+        with open(CONFIG_PATH, 'w') as f:
+            json.dump(model_config, f, indent=2)
+        print(f"💾 Model configuration saved to: {CONFIG_PATH}")
+        
+        print("🎯 Training and saving complete!")
 else:
-    print("⏭️ SKIPPING data preparation - using existing trained model")
-
-# Training (Only if needed)
-if not SKIP_TRAINING:
-    print(f"🚀 Starting training for {EPOCHS} epochs...")
-    
-    # Callbacks
-    callbacks = [
-        keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True),
-        keras.callbacks.ReduceLROnPlateau(factor=0.2, patience=5)
-    ]
-
-    # Train the model
-    history = model.fit(
-        train_generator,
-        epochs=EPOCHS,
-        validation_data=validation_generator,
-        callbacks=callbacks
-    )
-
-    print("✅ Training completed!")
-    
-    # Plot training history
-    def plot_training_history(history):
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-        
-        ax1.plot(history.history['accuracy'], label='Training Accuracy')
-        ax1.plot(history.history['val_accuracy'], label='Validation Accuracy')
-        ax1.set_title('Model Accuracy')
-        ax1.set_xlabel('Epoch')
-        ax1.set_ylabel('Accuracy')
-        ax1.legend()
-        
-        ax2.plot(history.history['loss'], label='Training Loss')
-        ax2.plot(history.history['val_loss'], label='Validation Loss')
-        ax2.set_title('Model Loss')
-        ax2.set_xlabel('Epoch')
-        ax2.set_ylabel('Loss')
-        ax2.legend()
-        
-        plt.tight_layout()
-        plt.show()
-
-    plot_training_history(history)
-    
-    # Evaluate and save model
-    val_loss, val_accuracy = model.evaluate(validation_generator)
-    print(f"📊 Final validation accuracy: {val_accuracy:.4f}")
-    
-    # Create models directory if it doesn't exist
-    os.makedirs('models', exist_ok=True)
-    
-    # Save the model
-    model.save(MODEL_PATH)
-    print(f"💾 Model saved to: {MODEL_PATH}")
-
-    # Save model configuration
-    model_config = {
-        'model_name': 'rice_disease_cnn_model',
-        'input_shape': list(IMG_SIZE) + [3],
-        'num_classes': len(CLASS_NAMES),
-        'class_names': CLASS_NAMES,
-        'batch_size': BATCH_SIZE,
-        'epochs_trained': len(history.history['loss']),
-        'final_accuracy': float(val_accuracy),
-        'final_loss': float(val_loss)
-    }
-
-    with open(CONFIG_PATH, 'w') as f:
-        json.dump(model_config, f, indent=2)
-
-    print(f"📋 Model configuration saved to: {CONFIG_PATH}")
-    
-else:
-    print("⏭️ SKIPPING TRAINING - Using existing trained model")
-    print("💡 To retrain: delete model files and run again")
+    # When imported as a module, just ensure model is loaded
+    if 'model' in globals() and model is not None:
+        print("✅ Rice disease model is loaded and ready for inference!")
+    else:
+        print("⚠️ Rice disease model not loaded yet - will be loaded on first use")
 
 # DISEASE ANALYSIS - The Main Feature!
 def predict_disease(image_path, model, class_names, img_size=(224, 224)):
@@ -316,41 +321,31 @@ print("🔍 RICE DISEASE ANALYSIS")
 print("=" * 50)
 print("Testing with sample images...")
 
-sample_images = [
-    'sample_images/healthy_leaf_sample.jpg',
-    'sample_images/rice_blast_sample.jpg'
-]
+# Only run this when the script is executed directly, not when imported
+if __name__ == "__main__":
+    sample_images = [
+        'sample_images/healthy_leaf_sample.jpg',
+        'sample_images/rice_blast_sample.jpg'
+    ]
 
-for image_path in sample_images:
-    if os.path.exists(image_path):
-        print(f"\n📸 Analyzing: {os.path.basename(image_path)}")
-        print("-" * 30)
-        
-        result = predict_disease(image_path, model, CLASS_NAMES, IMG_SIZE)
-        
-        if result:
-            print(f"🎯 PREDICTION: {result['predicted_class']}")
-            print(f"📊 CONFIDENCE: {result['confidence']:.4f} ({result['confidence']*100:.1f}%)")
-            
-            # Show confidence level
-            if result['confidence'] > 0.8:
-                print("✅ HIGH CONFIDENCE")
-            elif result['confidence'] > 0.6:
-                print("⚠️ MEDIUM CONFIDENCE")
-            else:
-                print("❌ LOW CONFIDENCE")
-            
-            print("\n📈 All probabilities:")
-            for class_name, prob in sorted(result['all_probabilities'].items(), key=lambda x: x[1], reverse=True):
-                bar = "█" * int(prob * 20)  # Simple progress bar
-                print(f"   {class_name:20}: {prob:.3f} {bar}")
+    for image_path in sample_images:
+        if os.path.exists(image_path):
+            print(f"\n📸 Analyzing: {os.path.basename(image_path)}")
+            print("-" * 30)
+            analyze_rice_disease(image_path)
         else:
-            print("❌ Failed to analyze image")
+            print(f"❌ Sample image not found: {image_path}")
+    
+    print("\n🎯 Testing complete!")
+else:
+    # When imported as a module, just print basic info
+    print("🌾 Rice Disease Analysis module loaded successfully!")
+    print(f"📊 Available classes: {CLASS_NAMES}")
+    print(f"🖼️ Image size: {IMG_SIZE}")
+    if 'model' in globals():
+        print("✅ Model is loaded and ready for inference!")
     else:
-        print(f"❌ Sample image not found: {image_path}")
-        print("   Make sure sample images are in the sample_images folder")
-
-print("\n✅ DISEASE ANALYSIS COMPLETE!")
+        print("⚠️ Model not loaded yet - will be loaded on first use")
 
 # System Summary
 print("🎉 RICE DISEASE DETECTION SYSTEM READY!")

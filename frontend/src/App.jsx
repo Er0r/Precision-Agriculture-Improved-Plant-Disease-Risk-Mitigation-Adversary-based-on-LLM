@@ -1,14 +1,18 @@
 import React, { useState } from 'react'
-import { Leaf } from 'lucide-react'
-import ImageUpload from './components/ImageUpload'
-import AnalysisResults from './components/AnalysisResults'
-import LoadingOverlay from './components/LoadingOverlay'
-import Toast from './components/Toast'
+import { Leaf, BarChart3 } from 'lucide-react'
+import ImageUpload from './components/upload/ImageUpload'
+import AnalysisResults from './components/results/AnalysisResults'
+import LoadingOverlay from './components/ui/LoadingOverlay'
+import Toast from './components/ui/Toast'
+import ClarityComparison from './components/results/ClarityComparison'
+import Home from './components/pages/Home'
+import { Routes, Route, Link, useLocation } from 'react-router-dom'
 
 function App() {
   const [analysisResult, setAnalysisResult] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [toast, setToast] = useState(null)
+  const location = useLocation()
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type })
@@ -28,47 +32,89 @@ function App() {
     setAnalysisResult(null)
   }
 
+  const isActive = (path) => location.pathname === path
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <Leaf className="w-12 h-12 mr-4" />
-              <h1 className="text-4xl font-bold">Smart Crop Disease Analyzer</h1>
+      {/* Navigation Header */}
+      <nav className="bg-white shadow-lg border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Leaf className="w-8 h-8 text-primary-600 mr-3" />
+              <h1 className="text-xl font-bold text-gray-900">Precision Agriculture Analytics</h1>
             </div>
-            <p className="text-xl text-primary-100">
-              AI-Powered Disease Detection & Treatment Recommendations
-            </p>
-            <p className="text-primary-200 mt-2">
-              Upload your crop images for instant expert analysis
-            </p>
+            <div className="flex space-x-8">
+              <Link
+                to="/"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/') 
+                    ? 'bg-primary-100 text-primary-700' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <Leaf className="w-4 h-4 mr-2" />
+                Disease Analysis
+              </Link>
+              <Link
+                to="/clarity-analytics"
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive('/clarity-analytics') 
+                    ? 'bg-primary-100 text-primary-700' 
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Clarity Analysis
+              </Link>
+            </div>
           </div>
         </div>
-      </header>
+      </nav>
+
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Upload Section */}
-          <div className="space-y-6">
-            <ImageUpload
-              onAnalysisComplete={handleAnalysisComplete}
-              onAnalysisError={handleAnalysisError}
-              onLoadingChange={setIsLoading}
-              onClearResults={clearResults}
-            />
-          </div>
+        <Routes>
+          <Route path="/" element={
+            <>
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  AI-Powered Crop Disease Analysis
+                </h2>
+                <p className="text-xl text-gray-600 mb-2">
+                  Upload crop images for instant disease detection and treatment recommendations
+                </p>
+                <p className="text-gray-500">
+                  Advanced analytics compare our results with established research standards
+                </p>
+              </div>
+              <Home
+                onAnalysisComplete={handleAnalysisComplete}
+                onAnalysisError={handleAnalysisError}
+                onLoadingChange={setIsLoading}
+                onClearResults={clearResults}
+                analysisResult={analysisResult}
+              />
+            </>
+          } />
 
-          {/* Results Section */}
-          <div className="space-y-6">
-            <AnalysisResults 
-              result={analysisResult}
-              onClear={clearResults}
-            />
-          </div>
-        </div>
+          <Route path="/clarity-analytics" element={
+            <div>
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Dataset Clarity Analysis
+                </h2>
+                <p className="text-xl text-gray-600 mb-2">
+                  Domain-aware clarity evaluation and dataset performance overview
+                </p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <ClarityComparison result={null} showCalculationDetails={true} />
+              </div>
+            </div>
+          } />
+        </Routes>
       </main>
 
       {/* Loading Overlay */}

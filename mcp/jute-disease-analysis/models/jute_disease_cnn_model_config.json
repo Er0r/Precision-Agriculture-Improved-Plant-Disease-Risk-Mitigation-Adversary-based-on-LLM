@@ -1,5 +1,6 @@
 {
   "model_name": "jute_disease_cnn_model",
+  "model_type": "transfer_learning_mobilenetv2",
   "input_shape": [
     224,
     224,
@@ -13,8 +14,11 @@
     "Mosaic",
     "Stem Soft Rot"
   ],
-  "batch_size": 32,
-  "epochs_trained": 30,
-  "final_accuracy": 0.8776978254318237,
-  "final_loss": 0.3196519911289215
+  "batch_size": 16,
+  "epochs_trained": 35,
+  "final_accuracy": 0.9136690497398376,
+  "final_loss": 0.24856142699718475,
+  "training_phases": 2,
+  "data_augmentation": "enhanced",
+  "architecture": "MobileNetV2 + Custom Head"
 }

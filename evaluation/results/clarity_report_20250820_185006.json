@@ -1,0 +1,77 @@
+{
+  "total_records": 17,
+  "statistics": {
+    "prevention": {
+      "FK_Grade": {
+        "mean": 20.854117647058832,
+        "min": 9.38,
+        "max": 35.63,
+        "count": 17
+      },
+      "Flesch_Reading_Ease": {
+        "mean": 6.951764705882352,
+        "min": -25.03,
+        "max": 47.82,
+        "count": 17
+      },
+      "SMOG_Index": {
+        "mean": 20.017058823529418,
+        "min": 11.77,
+        "max": 28.03,
+        "count": 17
+      },
+      "Gunning_Fog_Index": {
+        "mean": 26.000588235294106,
+        "min": 13.14,
+        "max": 40.4,
+        "count": 17
+      }
+    },
+    "recommendations": {
+      "FK_Grade": {
+        "mean": 18.939411764705888,
+        "min": 8.43,
+        "max": 36.13,
+        "count": 17
+      },
+      "Flesch_Reading_Ease": {
+        "mean": 21.37,
+        "min": -23.27,
+        "max": 50.76,
+        "count": 17
+      },
+      "SMOG_Index": {
+        "mean": 16.076470588235296,
+        "min": 9.92,
+        "max": 24.5,
+        "count": 17
+      },
+      "Gunning_Fog_Index": {
+        "mean": 21.12058823529412,
+        "min": 11.74,
+        "max": 38.69,
+        "count": 17
+      }
+    }
+  },
+  "insights": [
+    {
+      "field": "prevention",
+      "metric": "Flesch Reading Ease",
+      "average_score": 6.951764705882352,
+      "interpretation": "Very Difficult (graduate level)",
+      "difficulty_level": "High"
+    },
+    {
+      "field": "recommendations",
+      "metric": "Flesch Reading Ease",
+      "average_score": 21.37,
+      "interpretation": "Very Difficult (graduate level)",
+      "difficulty_level": "High"
+    }
+  ],
+  "recommendations": [
+    "Simplify prevention strategies text - currently too difficult for general audience",
+    "Simplify recommendations text - currently too difficult for general audience"
+  ]
+}

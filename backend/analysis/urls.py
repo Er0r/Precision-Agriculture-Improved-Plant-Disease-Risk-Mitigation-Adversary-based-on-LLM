@@ -7,4 +7,9 @@ urlpatterns = [
     path('analyze/', views.AnalyzeImageView.as_view(), name='analyze_image'),
     path('history/', views.AnalysisHistoryView.as_view(), name='analysis_history'),
     path('images/<uuid:image_id>/', views.ImageDetailView.as_view(), name='image_detail'),
+    path('serve/<uuid:image_id>/', views.ImageServeView.as_view(), name='serve_image'),
+    path('readability-results/', views.ReadabilityResultsView.as_view(), name='readability_results'),
+    path('postgresql-evaluation/', views.PostgreSQLEvaluationView.as_view(), name='postgresql_evaluation'),
+    path('postgresql-evaluation/export/', views.PostgreSQLEvaluationExportView.as_view(), name='postgresql_evaluation_export'),
+    path('clarity-analytics/', views.ClarityAnalyticsView.as_view(), name='clarity_analytics'),
 ]
