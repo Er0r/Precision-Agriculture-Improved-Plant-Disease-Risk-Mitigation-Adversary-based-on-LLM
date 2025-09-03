@@ -21,6 +21,32 @@ const Home = () => {
     setIsAnalyzing(false)
   }
 
+  const handleTestSentiment = () => {
+    // Mock analysis result with recommendations for testing sentiment analysis
+    const mockResult = {
+      disease_detected: true,
+      disease_name: "Rice Blast",
+      confidence: 0.89,
+      danger_level: "High",
+      recommendations: [
+        "Apply copper-based fungicides immediately to control the fungal infection",
+        "Ensure proper field drainage to reduce moisture and prevent disease spread",
+        "Remove infected plant debris and burn to eliminate spore sources",
+        "Use resistant rice varieties in future planting seasons",
+        "Monitor field conditions regularly and maintain optimal plant spacing"
+      ],
+      prevention_strategies: [
+        "Plant disease-resistant rice varieties with proven blast resistance",
+        "Maintain proper field sanitation by removing crop residues",
+        "Apply balanced fertilization to strengthen plant immunity", 
+        "Implement crop rotation with non-host plants",
+        "Install proper drainage systems to avoid water stagnation"
+      ],
+      analysis_timestamp: new Date().toISOString()
+    }
+    setAnalysisResult(mockResult)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
       <div className="container mx-auto px-4 py-8">
@@ -35,10 +61,20 @@ const Home = () => {
 
         <div className="max-w-4xl mx-auto">
           {!analysisResult && !isAnalyzing && (
-            <ImageUpload 
-              onAnalysisComplete={handleAnalysisComplete}
-              onAnalysisStart={handleAnalysisStart}
-            />
+            <>
+              <ImageUpload 
+                onAnalysisComplete={handleAnalysisComplete}
+                onAnalysisStart={handleAnalysisStart}
+              />
+              <div className="text-center mt-4">
+                <button
+                  onClick={handleTestSentiment}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Test Sentiment Analysis (Demo)
+                </button>
+              </div>
+            </>
           )}
 
           {isAnalyzing && (

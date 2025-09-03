@@ -12,4 +12,7 @@ urlpatterns = [
     path('postgresql-evaluation/', views.PostgreSQLEvaluationView.as_view(), name='postgresql_evaluation'),
     path('postgresql-evaluation/export/', views.PostgreSQLEvaluationExportView.as_view(), name='postgresql_evaluation_export'),
     path('clarity-analytics/', views.ClarityAnalyticsView.as_view(), name='clarity_analytics'),
+    path('sentiment-analytics/', views.SentimentAnalyticsView.as_view(), name='sentiment_analytics'),
+    path('sentiment-analyze/', views.SentimentAnalyzeView.as_view(), name='sentiment_analyze'),
+    path('individual-disease-sentiment/', views.IndividualDiseaseSentimentView.as_view(), name='individual_disease_sentiment'),
 ]

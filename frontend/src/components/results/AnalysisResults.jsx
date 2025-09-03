@@ -8,12 +8,17 @@ import {
   Clock, 
   Eye,
   TrendingUp,
-  Leaf
+  Leaf,
+  Heart
 } from 'lucide-react'
 import ClarityComparison from './ClarityComparison'
+import { analyzeSentiment } from '../../services/api'
 
 const AnalysisResults = ({ result, onClear }) => {
   const [confidenceWidth, setConfidenceWidth] = useState(0)
+  const [recommendationSentiments, setRecommendationSentiments] = useState({})
+  const [preventionSentiments, setPreventionSentiments] = useState({})
+  const [sentimentLoading, setSentimentLoading] = useState(false)
 
   useEffect(() => {
     if (result?.confidence) {
@@ -22,7 +27,65 @@ const AnalysisResults = ({ result, onClear }) => {
         setConfidenceWidth(result.confidence * 100)
       }, 100)
     }
+
+    // Analyze sentiment of recommendations and prevention strategies
+    if (result) {
+      analyzeSentimentForTexts()
+    }
   }, [result])
+
+  const analyzeSentimentForTexts = async () => {
+    setSentimentLoading(true)
+    try {
+      // Analyze recommendation sentiments
+      if (result.recommendations && result.recommendations.length > 0) {
+        const recSentiments = {}
+        for (let i = 0; i < result.recommendations.length; i++) {
+          try {
+            const sentiment = await analyzeSentiment(result.recommendations[i])
+            recSentiments[i] = sentiment
+          } catch (error) {
+            console.error(`Error analyzing sentiment for recommendation ${i}:`, error)
+          }
+        }
+        setRecommendationSentiments(recSentiments)
+      }
+
+      // Analyze prevention strategy sentiments
+      if (result.prevention_strategies && result.prevention_strategies.length > 0) {
+        const prevSentiments = {}
+        for (let i = 0; i < result.prevention_strategies.length; i++) {
+          try {
+            const sentiment = await analyzeSentiment(result.prevention_strategies[i])
+            prevSentiments[i] = sentiment
+          } catch (error) {
+            console.error(`Error analyzing sentiment for prevention strategy ${i}:`, error)
+          }
+        }
+        setPreventionSentiments(prevSentiments)
+      }
+    } catch (error) {
+      console.error('Error analyzing sentiments:', error)
+    } finally {
+      setSentimentLoading(false)
+    }
+  }
+
+  const getSentimentColor = (score) => {
+    if (score >= 0.5) return 'text-green-600 bg-green-50'
+    if (score >= 0.1) return 'text-blue-600 bg-blue-50'
+    if (score >= -0.1) return 'text-gray-600 bg-gray-50'
+    if (score >= -0.5) return 'text-orange-600 bg-orange-50'
+    return 'text-red-600 bg-red-50'
+  }
+
+  const getSentimentLabel = (score) => {
+    if (score >= 0.5) return 'Very Positive'
+    if (score >= 0.1) return 'Positive'
+    if (score >= -0.1) return 'Neutral'
+    if (score >= -0.5) return 'Negative'
+    return 'Very Negative'
+  }
 
   if (!result) {
     return (
@@ -152,14 +215,36 @@ const AnalysisResults = ({ result, onClear }) => {
                 Treatment Recommendations
               </h3>
               <div className="space-y-3">
-                {result.recommendations.map((rec, index) => (
-                  <div key={index} className="bg-gray-50 rounded-xl p-4 border-l-4 border-primary-500 hover:bg-gray-100 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <Leaf className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-800">{rec}</p>
+                {result.recommendations.map((rec, index) => {
+                  const sentiment = recommendationSentiments[index]
+                  return (
+                    <div key={index} className="bg-gray-50 rounded-xl p-4 border-l-4 border-primary-500 hover:bg-gray-100 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 flex-1">
+                          <Leaf className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-gray-800">{rec}</p>
+                        </div>
+                        {sentiment && !sentimentLoading && (
+                          <div className="flex items-center gap-2">
+                            <Heart className="w-4 h-4 text-pink-500" />
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSentimentColor(sentiment.sentiment_score)}`}>
+                              {getSentimentLabel(sentiment.sentiment_score)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {(sentiment.sentiment_score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        )}
+                        {sentimentLoading && (
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500"></div>
+                            <span className="text-xs text-gray-500">Analyzing...</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ) : (
@@ -186,14 +271,36 @@ const AnalysisResults = ({ result, onClear }) => {
                 Prevention Strategies
               </h3>
               <div className="space-y-3">
-                {result.prevention_strategies.map((strategy, index) => (
-                  <div key={index} className="bg-green-50 rounded-xl p-4 border-l-4 border-green-500 hover:bg-green-100 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-gray-800">{strategy}</p>
+                {result.prevention_strategies.map((strategy, index) => {
+                  const sentiment = preventionSentiments[index]
+                  return (
+                    <div key={index} className="bg-green-50 rounded-xl p-4 border-l-4 border-green-500 hover:bg-green-100 transition-colors">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3 flex-1">
+                          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                          <p className="text-gray-800">{strategy}</p>
+                        </div>
+                        {sentiment && !sentimentLoading && (
+                          <div className="flex items-center gap-2">
+                            <Heart className="w-4 h-4 text-pink-500" />
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getSentimentColor(sentiment.sentiment_score)}`}>
+                              {getSentimentLabel(sentiment.sentiment_score)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {(sentiment.sentiment_score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        )}
+                        {sentimentLoading && (
+                          <div className="flex items-center gap-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500"></div>
+                            <span className="text-xs text-gray-500">Analyzing...</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           ) : (

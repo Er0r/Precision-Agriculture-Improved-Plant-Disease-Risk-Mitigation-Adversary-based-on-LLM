@@ -60,4 +60,24 @@ export const getHistory = async () => {
     }
 }
 
+// Get sentiment analytics
+export const getSentimentAnalytics = async () => {
+    try {
+        const response = await api.get('/sentiment-analytics/')
+        return response.data
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to fetch sentiment analytics')
+    }
+}
+
+// Analyze text sentiment
+export const analyzeSentiment = async (text) => {
+    try {
+        const response = await api.post('/sentiment-analyze/', { text })
+        return response.data
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Sentiment analysis failed')
+    }
+}
+
 export default api
